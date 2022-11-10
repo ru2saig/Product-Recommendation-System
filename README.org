@@ -1,1 +1,13 @@
 * Product Recommendation System
+
+** Installation and Running
+Recommended to use a virtual environment.
+
+#+BEGIN_SRC sh
+  git clone https://github.com/ru2saig/Product-Recommendation-System
+  pip install -r requirements.txt
+  python app.py
+#+END_SRC
+
+Then open [[http://127.0.0.1:5000]].
+Try searching for B000026BTH!
