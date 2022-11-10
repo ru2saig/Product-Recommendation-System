@@ -15,5 +15,22 @@
     <input type="text" name="productid" id="productid" value="random"><br>
     <input type="submit" value="Get Recommendations">
   </form>
+
+  <h4> Searched for: {{ product_result[0] }} </h4>
+  <img src={{ product_result[1] }}>
+
+  <h4> Recommendations: </h4>
+  <ul>
+    {% for result in results_data %}
+    {% if result[0] == 404 %}
+    {% else %}
+    <li>
+      <em>{{ result[0] }} </em>
+      <img src={{ result[1] }}>
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+  
 </body>
 </html>
