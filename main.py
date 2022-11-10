@@ -1,13 +1,25 @@
-import bs4
 import re
-import requests
+import bs4
 import random
+import requests
 import numpy as np
 import pandas as pd
+from fake_useragent import UserAgent, FakeUserAgentError
 from sklearn.decomposition import TruncatedSVD
 from concurrent.futures import ThreadPoolExecutor
 
-HEADERS = ({'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36', 'Accept-Language': 'en-US, en;q=0.5'})
+
+HEADERS = {'authority': 'www.amazon.com',
+            'pragma': 'no-cache',
+            'cache-control': 'no-cache',
+            'dnt': '1',
+            'upgrade-insecure-requests': '1',
+            'user-agent': 'Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36',
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'sec-fetch-site': 'none',
+            'sec-fetch-mode': 'navigate',
+            'sec-fetch-dest': 'document',
+            'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',}
 
 product_image_re = re.compile(r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*")
 product_title_re = re.compile("[|-]")
@@ -23,15 +35,25 @@ def download_data(ASIN_id):
     """
     ASIN = ASIN_id
     URL = f"https://www.amazon.com/exec/obidos/ASIN/{ASIN}"
+    try:
+        HEADERS['user-agent'] = UserAgent(cache=False).random
+    except FakeUserAgentError:
+        HEADERS['user-agent'] = 'Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36'
+        
     webpage = requests.get(URL, headers=HEADERS)
+
     if not webpage.ok:  # If they're not on amazon.com, they can be on other domains
         print(f"Unable to find info on {ASIN_id} on amazon.com")
         return ("404", "404")
 
+    if webpage.status_code > 500:
+        print("Request blocked by amazon. Try a proxy")
+        return ("Beep", "Boop")
+
     print(f"Downloading Data of { ASIN_id }...")
     soup = bs4.BeautifulSoup(webpage.content, "lxml")
     title = soup.find("span", attrs={"id":'productTitle'})
-
+    
     product_name = product_title_re.split(title.string.strip())[0]
     product_image = soup.find("div", attrs={"id" : "imgTagWrapperId"})
     matches = product_image_re.finditer(str(product_image), re.MULTILINE)
