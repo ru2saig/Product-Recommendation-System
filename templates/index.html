@@ -10,27 +10,62 @@
     <title> Product Recommendation Demo </title>
 </head>
 <body>
-  <form action="/" method="POST">
-    <label for="productid">Enter a product ASIN, or random for a random product:</label><br>
-    <input type="text" name="productid" id="productid" value="random"><br>
-    <input type="submit" value="Get Recommendations">
-  </form>
+  <div class="container">
+    <div class="row justify-content-md-center p-2">
+      <div class="col-md-auto">
+	<form action="/" method="POST">
+	  <div class="col-md-auto">
+	    <label for="productid" class="form-label"> <h1> <b> Enter a product ASIN, or random for a random product: </b> </h1> </label>
+	    <input type="text" class="form-control" name="productid" id="productid" value="random"> 
+	  </div>
+	  <div class="col-md-auto p-2">
+	    <button type="submit" class="btn btn-primary" >Get Recommendations</button>
+	  </div>
+	</form>
+      </div>
+    </div>
 
-  <h4> Searched for: {{ product_result[0] }} </h4>
-  <img src={{ product_result[1] }}>
+    
+    <br>
+    
+    <div class="row justify-content-md-center">
+      <div class="col-md-auto">
+	<h4><u> Searched for: </u> {{ product_result[0] }} </h4>
+      </div>
+      <div class="col-md-auto">
+	<img src={{ product_result[1] }}>
+      </div>
+    </div>
 
-  <h4> Recommendations: </h4>
-  <ul>
-    {% for result in results_data %}
-    {% if result[0] == 404 %}
-    {% else %}
-    <li>
-      <em>{{ result[0] }} </em>
-      <img src={{ result[1] }}>
-    </li>
-    {% endif %}
-    {% endfor %}
-  </ul>
-  
+    <br>
+      
+    <div class="row justify-content-md-center">
+      <div class="col-md-auto">
+	<h4><u> Recommendations: </u></h4>
+      </ul>
+
+      <div class="col-md-auto">
+      <ul>
+	<div class="col-md-auto">
+	  {% for result in results_data %}
+	  {% if result[0] == 404 %}
+	  {% else %}
+	    <li>
+	      <div class="col-md-auto">
+		{{ result[0] }}
+	      </div>
+	      <div class="col-md-auto">
+		<img src={{ result[1] }} class="rounded mx-auto d-block" width=200 height=200>
+	      </div>
+	    </li>
+	  {% endif %}
+	  {% endfor %}
+	</div>
+      </ul>
+      
+      </div>
+      </div>
+    
+  </div>
 </body>
 </html>
