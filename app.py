@@ -74,20 +74,10 @@ def download_data(ASIN_id):
 
 
 @app.before_first_request
-def function_to_run_only_once(): # TODO: How to speed this up? This takes way too long!
-    amazon_ratings = pd.read_csv("customers_rating.csv")
-    amazon_ratings_subset = amazon_ratings.head(20000)
-    ratings_utility_matrix = amazon_ratings_subset.pivot_table(values='Rating', index='UserId', columns='ProductId', fill_value=0)
-
-    X = ratings_utility_matrix.T
-    X1 = X
-
-    SVD = TruncatedSVD(n_components=10)
-    decomposed_matrix = SVD.fit_transform(X)
-
-    correlation_matrix = np.corrcoef(decomposed_matrix)
-
-    cache.set("X", X  )  # ughhh
+def init_app(): 
+    X = pd.read_pickle("X.pickle")
+    correlation_matrix = np.load("correlation_matrix.pickle", allow_pickle=True)
+    cache.set("X", X  )  # Put these in Redis for speeeeeed
     cache.set("correlation_matrix", correlation_matrix)
 
 
@@ -111,7 +101,7 @@ def index():
 
         print(str(product_id).center(20, "="))
         product_result = download_data(product_id)
-        
+
         # TODO: Building a new dataset should fix this right up
         results_data = []
         with ThreadPoolExecutor() as executor:
