@@ -1,3 +1,4 @@
+import sys
 import re
 import bs4
 import random
@@ -74,9 +75,22 @@ def download_data(ASIN_id):
 
 
 @app.before_first_request
-def init_app(): 
-    X = pd.read_pickle("X.pickle")
-    correlation_matrix = np.load("correlation_matrix.pickle", allow_pickle=True)
+def init_app():
+    try:
+        X = pd.read_pickle("X.pickle")
+    except FileNotFoundError:
+        print("X.pickle file not found. Generate with generate_matrices.py.")
+        sys.exit(1)
+    except EOFError:
+        print("Something is wrong with X.pickle. Remove and re-generate with generate_matrices.py")
+        sys.exit(1)
+
+    try:
+        correlation_matrix = np.load("correlation_matrix.pickle", allow_pickle=True)
+    except FileNotFoundError:
+        print("correlation_matrix.pickle not found. Generate with generate_matrices.py")
+        sys.exit(2)
+
     cache.set("X", X  )  # Put these in Redis for speeeeeed
     cache.set("correlation_matrix", correlation_matrix)
 
